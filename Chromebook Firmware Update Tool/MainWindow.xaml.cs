@@ -645,6 +645,15 @@ namespace Chromebook_Firmware_Update_Tool
                                 return;
                             }
                         }
+
+                        if (this.chipset == "Intel Braswell" && this.extractMRCCache())
+                        {
+                            if (!this.injectMRCCache())
+                            {
+                                MessageBox.Show("Warning: Unable to preserve Memory Training Cache. The next boot may take longer.", "MRC Cache Warning");
+                            }
+                        }
+
                         this.progressBar.Value = 70.0;
 
                         if (this.macAddressInjectionRequired)
@@ -719,6 +728,36 @@ namespace Chromebook_Firmware_Update_Tool
             process.StartInfo.FileName = this.executableDir + "/cbtools/cbfstool.exe";
             process.StartInfo.WorkingDirectory = this.executableDir + "/cbtools";
             process.StartInfo.Arguments = "../fwupdate.bin write -r SMMSTORE -f ../smmstore";
+            process.StartInfo.UseShellExecute = true;
+            process.StartInfo.RedirectStandardOutput = false;
+            process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+            process.StartInfo.CreateNoWindow = false;
+            process.Start();
+            process.WaitForExit();
+            return process.ExitCode == 0;
+        }
+
+        private bool extractMRCCache()
+        {
+            Process process = new Process();
+            process.StartInfo.FileName = this.executableDir + "/cbtools/cbfstool.exe";
+            process.StartInfo.WorkingDirectory = this.executableDir + "/cbtools";
+            process.StartInfo.Arguments = "../fw-reconstructed.bin read -r RW_MRC_CACHE -f ../mrc.cache";
+            process.StartInfo.UseShellExecute = true;
+            process.StartInfo.RedirectStandardOutput = false;
+            process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+            process.StartInfo.CreateNoWindow = false;
+            process.Start();
+            process.WaitForExit();
+            return process.ExitCode == 0;
+        }
+
+        private bool injectMRCCache()
+        {
+            Process process = new Process();
+            process.StartInfo.FileName = this.executableDir + "/cbtools/cbfstool.exe";
+            process.StartInfo.WorkingDirectory = this.executableDir + "/cbtools";
+            process.StartInfo.Arguments = "../fwupdate.bin write -r RW_MRC_CACHE -f ../mrc.cache";
             process.StartInfo.UseShellExecute = true;
             process.StartInfo.RedirectStandardOutput = false;
             process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
