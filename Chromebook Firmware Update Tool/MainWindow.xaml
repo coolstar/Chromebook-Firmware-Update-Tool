@@ -4,9 +4,23 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Chromebook_Firmware_Update_Tool"
-        mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="Chromebook Firmware Update Tool" Height="420" Width="525" ResizeMode="CanMinimize">
     <Grid>
-        
+        <Image x:Name="modelTypeImg" HorizontalAlignment="Center" Height="220" Margin="0,50,0,0"
+           VerticalAlignment="Top" Width="220" Source="desktop.png"/>
+        <Label x:Name="modelLabel" Content="Detecting Model..." HorizontalAlignment="Center" Margin="0,15,0,0"
+           VerticalAlignment="Top" FontSize="22"/>
+        <Label x:Name="modelSupportedLabel" Content="Unsupported Model" HorizontalAlignment="Left"
+           Margin="184,250,0,0" VerticalAlignment="Top" FontSize="16"/>
+        <Image x:Name="supportedImg" HorizontalAlignment="Left" Height="25" Margin="150,254,0,0"
+           VerticalAlignment="Top" Width="24" Source="unknown.png"/>
+        <Button Click="updateBtn_Click" x:Name="updateBtn" Content="Update" HorizontalAlignment="Left"
+            Margin="86,356,0,0" VerticalAlignment="Top" Width="75" IsEnabled="false"/>
+        <Label x:Name="modelDetails" Content="Label" HorizontalAlignment="Center" Margin="0,286,0,0"
+           VerticalAlignment="Top"/>
+        <ProgressBar x:Name="progressBar" HorizontalAlignment="Left" Height="20" Margin="166,356,0,0"
+                 VerticalAlignment="Top" Width="302"/>
+        <Label x:Name="progressText" Content="Waiting for User Input..." HorizontalAlignment="Center" Height="30"
+           Margin="0,320,0,0" VerticalAlignment="Top"/>
     </Grid>
 </Window>
