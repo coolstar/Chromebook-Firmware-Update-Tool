@@ -547,6 +547,16 @@ namespace Chromebook_Firmware_Update_Tool
                 {
                     if (this.rebuildOldFirmware())
                     {
+                        if (extractNVRAM())
+                        {
+                            if (!injectNVRAM())
+                            {
+                                this.progressText.Content = (object)"Error preserving NVRAM...";
+                                return;
+                            }
+                        }
+                        this.progressBar.Value = 70.0;
+
                         if (this.macAddressInjectionRequired)
                         {
                             if (this.injectMacAddress())
@@ -596,6 +606,36 @@ namespace Chromebook_Firmware_Update_Tool
                 return true;
             }
             return false;
+        }
+
+        private bool extractNVRAM()
+        {
+            Process process = new Process();
+            process.StartInfo.FileName = this.executableDir + "/cbtools/cbfstool.exe";
+            process.StartInfo.WorkingDirectory = this.executableDir + "/cbtools";
+            process.StartInfo.Arguments = "../fw-reconstructed.bin read -r SMMSTORE -f ../smmstore";
+            process.StartInfo.UseShellExecute = true;
+            process.StartInfo.RedirectStandardOutput = false;
+            process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+            process.StartInfo.CreateNoWindow = false;
+            process.Start();
+            process.WaitForExit();
+            return process.ExitCode == 0;
+        }
+
+        private bool injectNVRAM()
+        {
+            Process process = new Process();
+            process.StartInfo.FileName = this.executableDir + "/cbtools/cbfstool.exe";
+            process.StartInfo.WorkingDirectory = this.executableDir + "/cbtools";
+            process.StartInfo.Arguments = "../fwupdate.bin write -r SMMSTORE -f ../smmstore";
+            process.StartInfo.UseShellExecute = true;
+            process.StartInfo.RedirectStandardOutput = false;
+            process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+            process.StartInfo.CreateNoWindow = false;
+            process.Start();
+            process.WaitForExit();
+            return process.ExitCode == 0;
         }
 
         private bool extractVPD()
