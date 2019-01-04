@@ -24,7 +24,8 @@ namespace Chromebook_Firmware_Update_Tool
         private string chipset = "";
         private string executableDir = "";
         private int deviceType;
-        private bool macAddressInjectionRequired;
+        private bool macAddressInjectionRequired = false;
+        private bool forceTrackpadDifferentiation = false;
 
         private string sha1OfFile(string path)
         {
@@ -97,6 +98,7 @@ namespace Chromebook_Firmware_Update_Tool
                 this.humanReadableModel = "Acer C720(P)";
                 this.chipset = "Intel Haswell";
                 this.deviceType = 1;
+                this.forceTrackpadDifferentiation = true;
                 return true;
             }
             if (lower == "falco")
@@ -493,10 +495,10 @@ namespace Chromebook_Firmware_Update_Tool
                 {
                     WebClient webClient = new WebClient();
                     webClient.Headers.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.10136");
-                    string str = webClient.DownloadString("https://coolstar.org/chromebook/cbmodels.json");
+                    string str = webClient.DownloadString("https://raw.githubusercontent.com/MrChromebox/scripts/master/cbmodels.json");
                     JObject json = (JObject)JsonConvert.DeserializeObject(str);
                     JObject modelData = null;
-                    if (json.ContainsKey(this.model.ToLower()))
+                    if (!this.forceTrackpadDifferentiation && json.ContainsKey(this.model.ToLower()))
                     {
                         modelData = (JObject)json[this.model.ToLower()];
                     } else if (json.ContainsKey(this.model.ToLower() + "-" + this.trackpadType.ToLower()))
