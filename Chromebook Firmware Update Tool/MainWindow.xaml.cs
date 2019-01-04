@@ -560,15 +560,10 @@ namespace Chromebook_Firmware_Update_Tool
         {
             if (this.executableDir == "")
                 this.executableDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            System.IO.File.Move(this.executableDir + "/fwupdate.bin", this.executableDir + "/fwupdate-raw.bin");
-            System.IO.File.Copy(this.executableDir + "/fwupdate-raw.bin", this.executableDir + "/fw-reconstructed.bin");
             if (!this.rebuildOldFirmware())
                 return false;
-            System.IO.File.Delete(this.executableDir + "/fw-reconstructed.bin");
-            System.IO.File.Move(this.executableDir + "/fw-reconstructed.bin.new", this.executableDir + "/fw-reconstructed.bin");
             if (!this.extractVPD())
                 return false;
-            System.IO.File.Copy(this.executableDir + "/fwupdate-raw.bin", this.executableDir + "/fwupdate.bin");
             return this.injectVPD();
         }
 
@@ -576,6 +571,9 @@ namespace Chromebook_Firmware_Update_Tool
         {
             if (this.executableDir == "")
                 this.executableDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            System.IO.File.Copy(this.executableDir + "/fwupdate.bin", this.executableDir + "/fwupdate-raw.bin");
+            System.IO.File.Copy(this.executableDir + "/fwupdate.bin", this.executableDir + "/fw-reconstructed.bin");
+
             Process process = new Process();
             process.StartInfo.FileName = this.executableDir + "/cbtools/ifdtool.exe";
             process.StartInfo.WorkingDirectory = this.executableDir + "/cbtools";
@@ -586,7 +584,14 @@ namespace Chromebook_Firmware_Update_Tool
             process.StartInfo.CreateNoWindow = false;
             process.Start();
             process.WaitForExit();
-            return process.ExitCode == 0;
+
+            if (process.ExitCode == 0)
+            {
+                System.IO.File.Delete(this.executableDir + "/fw-reconstructed.bin");
+                System.IO.File.Move(this.executableDir + "/fw-reconstructed.bin.new", this.executableDir + "/fw-reconstructed.bin");
+                return true;
+            }
+            return false;
         }
 
         private bool extractVPD()
