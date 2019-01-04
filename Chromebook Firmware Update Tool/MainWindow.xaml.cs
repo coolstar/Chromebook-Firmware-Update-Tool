@@ -93,6 +93,8 @@ namespace Chromebook_Firmware_Update_Tool
         private bool isModelSupported()
         {
             string lower = this.model.ToLower();
+            //Haswell
+
             if (lower == "peppy")
             {
                 this.humanReadableModel = "Acer C720(P)";
@@ -161,6 +163,8 @@ namespace Chromebook_Firmware_Update_Tool
                 this.deviceType = 2;
                 return true;
             }
+
+            //Broadwell
             if (lower == "auron")
             {
                 new AuronConfirm() { mainWindow = this }.ShowDialog();
@@ -233,6 +237,8 @@ namespace Chromebook_Firmware_Update_Tool
                 this.deviceType = 2;
                 return true;
             }
+
+            //Sandy/Ivy Bridge
             if (lower == "parrot")
             {
                 this.humanReadableModel = "Acer C7/C710";
@@ -275,6 +281,9 @@ namespace Chromebook_Firmware_Update_Tool
                 this.deviceType = 1;
                 return false;
             }
+
+
+            //Bay Trail
             if (lower == "banjo")
             {
                 this.humanReadableModel = "Acer Chromebook 15";
@@ -375,6 +384,85 @@ namespace Chromebook_Firmware_Update_Tool
                 this.deviceType = 2;
                 return true;
             }
+
+            //Braswell
+            if (lower == "banon")
+            {
+                this.humanReadableModel = "Acer 15.6 Chromebook";
+                this.chipset = "Intel Braswell";
+                this.deviceType = 1;
+                return true;
+            }
+            if (lower == "celes")
+            {
+                this.humanReadableModel = "Samsung Chromebook 3";
+                this.chipset = "Intel Braswell";
+                this.deviceType = 1;
+                return false;
+            }
+            if (lower == "cyan")
+            {
+                this.humanReadableModel = "Acer Chromebook R11";
+                this.chipset = "Intel Braswell";
+                this.deviceType = 1;
+                return true;
+            }
+            if (lower == "edgar")
+            {
+                this.humanReadableModel = "Acer Chromebook 14";
+                this.chipset = "Intel Braswell";
+                this.deviceType = 1;
+                return true;
+            }
+            if (lower == "kefka")
+            {
+                this.humanReadableModel = "Dell Chromebook 11 3180";
+                this.chipset = "Intel Braswell";
+                this.deviceType = 1;
+                return true;
+            }
+            if (lower == "reks")
+            {
+                this.humanReadableModel = "Lenovo Chromebook 11";
+                this.chipset = "Intel Braswell";
+                this.deviceType = 1;
+                return true;
+            }
+            if (lower == "relm")
+            {
+                this.humanReadableModel = "<white label>";
+                this.chipset = "Intel Braswell";
+                this.deviceType = 1;
+                return true;
+            }
+            if (lower == "setzer")
+            {
+                this.humanReadableModel = "HP Chromebook 11 G5";
+                this.chipset = "Intel Braswell";
+                this.deviceType = 1;
+                return true;
+            }
+            if (lower == "terra")
+            {
+                this.humanReadableModel = "Asus Chromebook C202SA/C302SA";
+                this.chipset = "Intel Braswell";
+                this.deviceType = 1;
+                return true;
+            }
+            if (lower == "ultima")
+            {
+                this.humanReadableModel = "Thinkpad 11e Chromebook (3rd gen)";
+                this.chipset = "Intel Braswell";
+                this.deviceType = 1;
+                return true;
+            }
+            if (lower == "wizpig")
+            {
+                this.humanReadableModel = "<white label>";
+                this.chipset = "Intel Braswell";
+                this.deviceType = 1;
+                return true;
+            }
             this.humanReadableModel = "Unknown: " + this.model;
             return false;
         }
@@ -441,7 +529,7 @@ namespace Chromebook_Firmware_Update_Tool
             this.progressBar.Value = 10.0;
             if ((this.chipset == "Intel Haswell" || this.chipset == "Intel Broadwell") && !this.backupHSW())
                 this.progressText.Content = (object)"Error Backing Up Existing Firmware!";
-            else if (this.chipset == "Intel Bay Trail" && !this.backupBYT())
+            else if ((this.chipset == "Intel Bay Trail" || this.chipset == "Intel Braswell") && !this.backupBYT())
                 this.progressText.Content = (object)"Error Backing Up Existing Firmware!";
             else
                 this.downloadFWManifest();
@@ -681,7 +769,7 @@ namespace Chromebook_Firmware_Update_Tool
                 this.progressText.Content = (object)"Error Flashing Firmware! DO NOT REBOOT!";
                 int num = (int)MessageBox.Show("Error Flashing Firmware! DO NOT REBOOT. Please use FPT to flash fwbackup.bin manually.");
             }
-            else if (this.chipset == "Intel Bay Trail" && !this.flashBYT())
+            else if ((this.chipset == "Intel Bay Trail" || this.chipset == "Intel Braswell") && !this.flashBYT())
             {
                 this.progressText.Content = (object)"Error Flashing Firmware! DO NOT REBOOT!";
                 int num = (int)MessageBox.Show("Error Flashing Firmware! DO NOT REBOOT. Please use FPT to flash fwbackup.bin manually.");
