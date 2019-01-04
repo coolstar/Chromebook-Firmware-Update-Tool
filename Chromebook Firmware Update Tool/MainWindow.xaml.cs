@@ -504,6 +504,7 @@ namespace Chromebook_Firmware_Update_Tool
                 this.modelSupportedLabel.Content = (object)"Firmware Update Supported";
                 this.supportedImg.Source = (ImageSource)new BitmapImage(new Uri("checkmark.png", UriKind.Relative));
                 this.updateBtn.IsEnabled = true;
+                this.cleanInstall.IsEnabled = true;
             }
             else
             {
@@ -523,6 +524,7 @@ namespace Chromebook_Firmware_Update_Tool
         private void updateBtn_Click(object sender, RoutedEventArgs e)
         {
             this.updateBtn.IsEnabled = false;
+            this.cleanInstall.IsEnabled = false;
             if (!this.checkHashes(true))
                 return;
             this.progressText.Content = (object)"Backing Up Current Firmware...";
@@ -637,12 +639,15 @@ namespace Chromebook_Firmware_Update_Tool
                 {
                     if (this.rebuildOldFirmware())
                     {
-                        if (extractNVRAM())
+                        if (!this.cleanInstall.IsChecked.Value)
                         {
-                            if (!injectNVRAM())
+                            if (extractNVRAM())
                             {
-                                this.progressText.Content = (object)"Error preserving NVRAM...";
-                                return;
+                                if (!injectNVRAM())
+                                {
+                                    this.progressText.Content = (object)"Error preserving NVRAM...";
+                                    return;
+                                }
                             }
                         }
 
@@ -848,6 +853,11 @@ namespace Chromebook_Firmware_Update_Tool
             process.Start();
             process.WaitForExit();
             return process.ExitCode == 0;
+        }
+
+        private void CleanInstall_Checked(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show("Warning: Enabling this option will wipe all saved settings, including boot entries and boot order.", "Clean Install");
         }
     }
 }
