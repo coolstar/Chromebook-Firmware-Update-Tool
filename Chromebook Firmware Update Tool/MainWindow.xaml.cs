@@ -539,18 +539,28 @@ namespace Chromebook_Firmware_Update_Tool
             webClient.DownloadProgressChanged += (DownloadProgressChangedEventHandler)((sender, e) => this.progressBar.Value = 40.0 + (double)e.ProgressPercentage * 0.2);
             webClient.DownloadFileCompleted += (AsyncCompletedEventHandler)((sender, e) =>
             {
+
                 this.progressBar.Value = 60.0;
                 if (this.sha1OfFile(this.executableDir + "/fwupdate.bin") != fwSHA)
                     this.progressText.Content = (object)"Error verifying Firmware...";
-                else if (this.macAddressInjectionRequired)
-                {
-                    if (this.injectMacAddress())
-                        this.flashFW();
-                    else
-                        this.progressText.Content = (object)"Error Injecting MAC Address...";
-                }
                 else
-                    this.flashFW();
+                {
+                    if (this.rebuildOldFirmware())
+                    {
+                        if (this.macAddressInjectionRequired)
+                        {
+                            if (this.injectMacAddress())
+                                this.flashFW();
+                            else
+                                this.progressText.Content = (object)"Error Injecting MAC Address...";
+                        }
+                        else
+                            this.flashFW();
+                    } else
+                    {
+                        this.progressText.Content = (object)"Error Processing dumped firmware...";
+                    }
+                }
             });
             Console.WriteLine(fwURL);
             webClient.DownloadFileAsync(new Uri(fwURL, UriKind.Absolute), this.executableDir + "/fwupdate.bin");
@@ -558,10 +568,6 @@ namespace Chromebook_Firmware_Update_Tool
 
         private bool injectMacAddress()
         {
-            if (this.executableDir == "")
-                this.executableDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            if (!this.rebuildOldFirmware())
-                return false;
             if (!this.extractVPD())
                 return false;
             return this.injectVPD();
@@ -569,8 +575,6 @@ namespace Chromebook_Firmware_Update_Tool
 
         private bool rebuildOldFirmware()
         {
-            if (this.executableDir == "")
-                this.executableDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             System.IO.File.Copy(this.executableDir + "/fwupdate.bin", this.executableDir + "/fwupdate-raw.bin");
             System.IO.File.Copy(this.executableDir + "/fwupdate.bin", this.executableDir + "/fw-reconstructed.bin");
 
@@ -596,8 +600,6 @@ namespace Chromebook_Firmware_Update_Tool
 
         private bool extractVPD()
         {
-            if (this.executableDir == "")
-                this.executableDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             Process process = new Process();
             process.StartInfo.FileName = this.executableDir + "/cbtools/cbfstool.exe";
             process.StartInfo.WorkingDirectory = this.executableDir + "/cbtools";
@@ -613,8 +615,6 @@ namespace Chromebook_Firmware_Update_Tool
 
         private bool injectVPD()
         {
-            if (this.executableDir == "")
-                this.executableDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             Process process = new Process();
             process.StartInfo.FileName = this.executableDir + "/cbtools/cbfstool.exe";
             process.StartInfo.WorkingDirectory = this.executableDir + "/cbtools";
@@ -653,8 +653,6 @@ namespace Chromebook_Firmware_Update_Tool
 
         private bool flashHSW()
         {
-            if (this.executableDir == "")
-                this.executableDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             Process process = new Process();
             process.StartInfo.FileName = this.executableDir + "/FPT-HSWBDW/fptw64.exe";
             process.StartInfo.WorkingDirectory = this.executableDir + "/FPT-HSWBDW";
@@ -670,8 +668,6 @@ namespace Chromebook_Firmware_Update_Tool
 
         private bool flashBYT()
         {
-            if (this.executableDir == "")
-                this.executableDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             Process process = new Process();
             process.StartInfo.FileName = this.executableDir + "/FPT-BYTBSW/fptw64.exe";
             process.StartInfo.WorkingDirectory = this.executableDir + "/FPT-BYTBSW";
