@@ -593,7 +593,7 @@ namespace Chromebook_Firmware_Update_Tool
                         modelData = (JObject)json[this.model.ToLower()];
                     } else if (json.ContainsKey(this.model.ToLower() + "-" + this.trackpadType.ToLower()))
                     {
-                        modelData = (JObject)json[this.model.ToLower() + "-" + this.trackpadType.ToLower()];
+                        modelData = (JObject)json[(this.model.ToLower() + "-" + this.trackpadType.ToLower()).Trim('-')];
                     }
                     if (modelData != null)
                     {
